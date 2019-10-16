@@ -1,0 +1,41 @@
+
+subprojects {
+
+	apply plugin: 'java'
+
+	uploadArchives {
+		repositories {
+			ivy {
+				url = getProperty("repo.url")
+				credentials {
+					username = getProperty("repo.user")
+					password = getProperty("repo.password")
+				}
+			}
+		}
+	}
+
+	// example from documentation
+	// https://docs.gradle.org/current/userguide/tutorial_using_tasks.html
+	task distribution {
+		doLast {
+			println "We build the zip with version=$version"
+		}
+	}
+	
+	task release {
+		dependsOn 'distribution'
+		doLast {
+			println 'We release now'
+		}
+	}
+	
+	gradle.taskGraph.whenReady { taskGraph ->
+		if (taskGraph.hasTask(":release")) {
+			version = '1.0'
+		} else {
+			version = '1.0-SNAPSHOT'
+		}
+	}
+	
+}
